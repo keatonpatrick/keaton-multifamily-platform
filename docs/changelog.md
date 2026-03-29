@@ -71,7 +71,7 @@ Description of what changed and why.
 
 ### Tables Created (15 total)
 
-**From RealPage BIX (schema-matched):**
+**From RealPage (schema-matched):**
 - `dim_organization` — org hierarchy
 - `dim_building` — physical buildings within properties
 - `dim_floor_plan` — unit type definitions (46 columns)
@@ -85,17 +85,17 @@ Description of what changed and why.
 - `dim_concession` — lease incentives
 - `dim_renewal` — renewal offers
 
-**Enriched (RP base + Petra Capital fields):**
-- `dim_property` — master property record. All 35 RP BIX columns plus 30 enrichment fields covering regional hierarchy (East/West, Area), investment/ownership (owned vs. third-party managed, fund, valuation), asset classification (class, strategy, type, stabilization status), physical characteristics (4 sqft fields, parking, amenities), and management contacts. ~65 columns total.
+**Enriched (RealPage base + Petra Capital fields):**
+- `dim_property` — master property record. All 35 RealPage columns plus 30 enrichment fields covering regional hierarchy (East/West, Area), investment/ownership (owned vs. third-party managed, fund, valuation), asset classification (class, strategy, type, stabilization status), physical characteristics (4 sqft fields, parking, amenities), and management contacts. ~65 columns total.
 
-**New (not from RP):**
+**New (not from RealPage):**
 - `dim_market` — geographic hierarchy (Region > State > Area)
-- `dim_employee_roster` — enriched staff roster with roles, property assignments, and org chart hierarchy. Separate from RP DimEmployee (different source/purpose).
+- `dim_employee_roster` — enriched staff roster with roles, property assignments, and org chart hierarchy. Separate from RealPage DimEmployee (different source/purpose).
 
 ### Design Decisions
 - PII fields in dim_resident and dim_resident_member use STRING instead of varbinary since synthetic data has no real PII to encrypt. Documented as intentional design choice.
 - dim_employee_roster is deliberately separate from dim_employee: one represents PMS system user data (from RealPage), the other represents company HR/organizational master data (internal). Different sources, different update cadences, different purposes.
-- RP BIX SCD Type 2 patterns (RowStartDate, RowEndDate, RowIsCurrent, IsDeleted, IsLastRow) preserved in all RP-matched tables to demonstrate understanding of slowly changing dimensions.
+- RealPage SCD Type 2 patterns (RowStartDate, RowEndDate, RowIsCurrent, IsDeleted, IsLastRow) preserved in all RP-matched tables to demonstrate understanding of slowly changing dimensions.
 
 ---
 

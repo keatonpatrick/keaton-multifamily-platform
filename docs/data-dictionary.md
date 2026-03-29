@@ -56,7 +56,7 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimOrganization (schema-matched) |
+| **Source** | RealPage — DimOrganization (schema-matched) |
 | **Grain** | One row per organization (SCD Type 2 — versioned) |
 | **Description** | Top-level organizational entity. In our case, Petra Capital Partners is the primary organization. |
 | **Key Relationships** | Referenced by `dim_property.OrganizationKey` |
@@ -79,12 +79,12 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimProperty (all 35 columns) + Petra Capital enrichment |
+| **Source** | RealPage — DimProperty (all 35 columns) + Petra Capital enrichment |
 | **Grain** | One row per property |
-| **Description** | The spine of the entire data model. Every table in the platform joins back to PropertyKey. Base columns match the RP BIX schema exactly. Enrichment fields add regional hierarchy, investment/ownership data, asset classification, physical characteristics, and management contacts. This is master data maintained by the data team — not just a copy of what RealPage provides. |
+| **Description** | The spine of the entire data model. Every table in the platform joins back to PropertyKey. Base columns match the RealPage schema exactly. Enrichment fields add regional hierarchy, investment/ownership data, asset classification, physical characteristics, and management contacts. This is master data maintained by the data team — not just a copy of what RealPage provides. |
 | **Key Relationships** | `OrganizationKey` → `dim_organization`, `MarketKey` → `dim_market`. Referenced by nearly every other table via `PropertyKey`. |
 
-**RealPage BIX Columns (35):**
+**RealPage Columns (35):**
 
 | Column | Type | Nullable | Description |
 |--------|------|----------|-------------|
@@ -189,7 +189,7 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimBuilding (schema-matched) |
+| **Source** | RealPage — DimBuilding (schema-matched) |
 | **Grain** | One row per building (SCD Type 2) |
 | **Description** | Physical buildings within a property. One property can have multiple buildings. Contains address, construction dates, and physical characteristics per building. |
 | **Key Relationships** | `PropertyKey` → `dim_property`. Referenced by `dim_unit.BuildingKey`. |
@@ -240,12 +240,12 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimFloorPlan (schema-matched) |
+| **Source** | RealPage — DimFloorPlan (schema-matched) |
 | **Grain** | One row per floor plan per property (SCD Type 2) |
 | **Description** | Defines unit types available at each property. Each floor plan specifies bedroom/bathroom count, square footage, and rent ranges. Marketing names like "The Magnolia" or "The Live Oak" are assigned per plan. |
 | **Key Relationships** | `PropertyKey` → `dim_property`. Referenced by `dim_unit.FloorPlanKey`. |
 
-*46 columns — matches RP BIX DimFloorPlan exactly. Key columns:*
+*46 columns — matches RealPage DimFloorPlan exactly. Key columns:*
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -269,12 +269,12 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimUnit (schema-matched) |
+| **Source** | RealPage — DimUnit (schema-matched) |
 | **Grain** | One row per unit (SCD Type 2) |
 | **Description** | Individual apartment units. Contains physical characteristics, availability status, compliance flags, and address details per unit. |
 | **Key Relationships** | `PropertyKey` → `dim_property`, `FloorPlanKey` → `dim_floor_plan`, `BuildingKey` → `dim_building`. Referenced by lease and transaction tables. |
 
-*65 columns — matches RP BIX DimUnit exactly. Key columns:*
+*65 columns — matches RealPage DimUnit exactly. Key columns:*
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -298,12 +298,12 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimResident (schema-matched) |
+| **Source** | RealPage — DimResident (schema-matched) |
 | **Grain** | One row per household (SCD Type 2) |
-| **Description** | Household-level resident record. Contains payment behavior flags, collection status, and eviction holds. PII fields are STRING in synthetic data (varbinary/encrypted in real RP). |
+| **Description** | Household-level resident record. Contains payment behavior flags, collection status, and eviction holds. PII fields are STRING in synthetic data (varbinary/encrypted in real RealPage). |
 | **Key Relationships** | `PropertyKey` → `dim_property`. Referenced by `dim_renewal.ResidentKey`. Parent of `dim_resident_member`. |
 
-*31 columns — matches RP BIX DimResident. PII fields adapted from varbinary to STRING for synthetic data. Key columns:*
+*31 columns — matches RealPage DimResident. PII fields adapted from varbinary to STRING for synthetic data. Key columns:*
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -321,12 +321,12 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimResidentMember (schema-matched) |
+| **Source** | RealPage — DimResidentMember (schema-matched) |
 | **Grain** | One row per individual person per lease (SCD Type 2) |
 | **Description** | Individual people within a household — roommates, co-signers, guarantors. Contains demographics, lease role flags, and military status. PII fields adapted from varbinary to STRING. |
 | **Key Relationships** | `PropertyKey` → `dim_property`, `ResidentHouseHoldID` links to `dim_resident`. |
 
-*63 columns — matches RP BIX DimResidentMember. Key columns:*
+*63 columns — matches RealPage DimResidentMember. Key columns:*
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -345,12 +345,12 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimLeaseAttributes (schema-matched) |
+| **Source** | RealPage — DimLeaseAttributes (schema-matched) |
 | **Grain** | One row per lease (SCD Type 2) |
 | **Description** | Core lease record. Contains lease terms, all key dates (application through move-out), status flags, renewal/transfer/eviction indicators, and move-out/cancel reasons. One of the most important tables for operational analytics. |
 | **Key Relationships** | `PropertyKey` → `dim_property`, `osl_LeaseID` links to transaction and resident tables. |
 
-*66 columns — matches RP BIX DimLeaseAttributes. Key columns:*
+*66 columns — matches RealPage DimLeaseAttributes. Key columns:*
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -373,12 +373,12 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | RealPage BIX — DimEmployee (schema-matched) |
+| **Source** | RealPage — DimEmployee (schema-matched) |
 | **Grain** | One row per PMS system user (SCD Type 2) |
 | **Description** | PMS system-level employee data. Thin table with login info and system identifiers. For the enriched staff roster with roles and org chart, see `dim_employee_roster`. |
 | **Key Relationships** | Referenced by `dim_employee_roster.EmployeeKey`. |
 
-*19 columns — matches RP BIX DimEmployee exactly.*
+*19 columns — matches RealPage DimEmployee exactly.*
 
 ---
 
@@ -388,7 +388,7 @@ Design decision: dims live in their own schema rather than gold because they're 
 |---|---|
 | **Source** | Internal — Petra Capital HR/org master data |
 | **Grain** | One row per employee-to-assignment (an employee can have one role at one scope) |
-| **Description** | Enriched staff roster linking employees to properties with roles. Separate from RP DimEmployee — different source, different purpose. One is PMS system users, this is company org chart. Powers the communication layer and reporting hierarchy. |
+| **Description** | Enriched staff roster linking employees to properties with roles. Separate from RealPage DimEmployee — different source, different purpose. One is PMS system users, this is company org chart. Powers the communication layer and reporting hierarchy. |
 | **Key Relationships** | `EmployeeKey` → `dim_employee`, `PropertyKey` → `dim_property`, `MarketKey` → `dim_market`, `ReportsToRosterKey` → self (org hierarchy). |
 
 | Column | Type | Nullable | Description |
@@ -416,7 +416,7 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | Based on RealPage BIX — DimTransactionCode |
+| **Source** | RealPage — DimTransactionCode (schema-matched) |
 | **Grain** | One row per transaction code per property |
 | **Description** | Charge and credit type definitions for the unit ledger. Maps codes like RENT, PARK, LATE, UTIL to descriptions, categories, and GL accounts. |
 | **Key Relationships** | `PropertyKey` → `dim_property`. Referenced by transaction/charge fact tables. |
@@ -438,7 +438,7 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | Based on RealPage BIX — DimMoveOutReason |
+| **Source** | RealPage — DimMoveOutReason (schema-matched) |
 | **Grain** | One row per move-out reason per property |
 | **Description** | Why residents leave. Critical for retention analytics. Reasons are grouped into categories (Price, Relocation, Service, Life Event, etc.) for rollup reporting. |
 | **Key Relationships** | `PropertyKey` → `dim_property`. Referenced by `dim_lease_attributes.MoveOutReason`. |
@@ -451,7 +451,7 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | Based on RealPage BIX — DimConcession |
+| **Source** | RealPage — DimConcession (schema-matched) |
 | **Grain** | One row per concession per property |
 | **Description** | Lease concessions and incentives (free month, reduced rent, waived fees). Tracks amount, type, and effective dates. |
 | **Key Relationships** | `PropertyKey` → `dim_property`. |
@@ -464,7 +464,7 @@ Design decision: dims live in their own schema rather than gold because they're 
 
 | | |
 |---|---|
-| **Source** | Based on RealPage BIX — DimRenewal |
+| **Source** | RealPage — DimRenewal (schema-matched) |
 | **Grain** | One row per renewal offer |
 | **Description** | Renewal offers extended to existing residents. Tracks offer status (Pending, Accepted, Declined, Expired) and response timing. |
 | **Key Relationships** | `PropertyKey` → `dim_property`, `UnitKey` → `dim_unit`, `ResidentKey` → `dim_resident`, `LeaseAttributesKey` → `dim_lease_attributes`. |
