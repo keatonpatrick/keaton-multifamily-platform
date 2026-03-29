@@ -47,7 +47,7 @@ This is not a toy demo — it mirrors the architecture, schema complexity, and d
 ### Medallion Architecture + Dimensional Model
 
 - **`dim`** — Kimball-style dimension tables. Shared reference data used by every layer. Property, unit, resident, employee, lease, and market dimensions. [ADR-001: Why dims get their own schema](docs/adr/001-kimball-dims-separate-schema.md)
-- **`bronze`** — Raw data as received from source systems. Schemas match source (e.g., RealPage BIX) with no transformation.
+- **`bronze`** — Raw data as received from source systems. Schemas match source format with no transformation.
 - **`silver`** — Cleaned, typed, deduplicated. Cross-platform entity resolution happens here.
 - **`gold`** — Business-ready KPIs, aggregated metrics, dashboard-ready tables.
 - **`analytics`** — Ad-hoc analysis and exploratory work.
@@ -57,14 +57,14 @@ This is not a toy demo — it mirrors the architecture, schema complexity, and d
 
 | Source | Type | What It Provides |
 |--------|------|-----------------|
-| RealPage (BIX) | PMS | Leases, units, residents, financials, work orders |
+| RealPage | PMS | Leases, units, residents, financials, work orders |
 | Knock | CRM | Leads, tours, follow-ups, conversion tracking |
 | Birdeye | Reputation | Reviews, ratings, response metrics |
 | Google Ads | Marketing | Ad spend, impressions, clicks, conversions |
 | Apartments.com | ILS | Listing performance, lead attribution |
 | Census/ACS | Market | Demographics, economic indicators |
 
-All source data is **synthetic**, generated to match real-world schema structures and statistical distributions. PMS data is modeled on the RealPage BIX schema (553 tables in the real system — we implement the ~40 most operationally relevant).
+All source data is **synthetic**, generated to match real-world schema structures and statistical distributions. PMS data is modeled on the RealPage schema (~40 of the most operationally relevant tables implemented).
 
 ## Portfolio
 
@@ -84,20 +84,20 @@ Properties range from 80-unit garden communities to 400+ unit mid-rise developme
 | Table | Source | Description |
 |-------|--------|-------------|
 | `dim_market` | Internal | Geographic hierarchy (Region > State > Area) |
-| `dim_organization` | RealPage BIX | Organization hierarchy |
-| `dim_property` | RealPage BIX + Enriched | Master property record — 35 RP columns + 30 enrichment fields |
-| `dim_building` | RealPage BIX | Physical buildings within properties |
-| `dim_floor_plan` | RealPage BIX | Unit type definitions |
-| `dim_unit` | RealPage BIX | Individual apartment units |
-| `dim_resident` | RealPage BIX | Household-level resident records |
-| `dim_resident_member` | RealPage BIX | Individual people within households |
-| `dim_lease_attributes` | RealPage BIX | Lease details, dates, and statuses |
-| `dim_employee` | RealPage BIX | PMS system-level employee data |
+| `dim_organization` | RealPage | Organization hierarchy |
+| `dim_property` | RealPage + Enriched | Master property record — 35 RP columns + 30 enrichment fields |
+| `dim_building` | RealPage | Physical buildings within properties |
+| `dim_floor_plan` | RealPage | Unit type definitions |
+| `dim_unit` | RealPage | Individual apartment units |
+| `dim_resident` | RealPage | Household-level resident records |
+| `dim_resident_member` | RealPage | Individual people within households |
+| `dim_lease_attributes` | RealPage | Lease details, dates, and statuses |
+| `dim_employee` | RealPage | PMS system-level employee data |
 | `dim_employee_roster` | Internal | Enriched staff roster with roles and org chart |
-| `dim_transaction_code` | RealPage BIX | Charge/credit type definitions |
-| `dim_move_out_reason` | RealPage BIX | Resident departure reasons |
-| `dim_concession` | RealPage BIX | Lease incentives |
-| `dim_renewal` | RealPage BIX | Renewal offers |
+| `dim_transaction_code` | RealPage | Charge/credit type definitions |
+| `dim_move_out_reason` | RealPage | Resident departure reasons |
+| `dim_concession` | RealPage | Lease incentives |
+| `dim_renewal` | RealPage | Renewal offers |
 
 ## Infrastructure
 
