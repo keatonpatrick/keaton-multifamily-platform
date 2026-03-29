@@ -16,9 +16,9 @@ This is not a toy demo — it mirrors the architecture, schema complexity, and d
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     Source Systems                               │
-│  RealPage (PMS)  ·  Knock (CRM)  ·  Birdeye (Reputation)      │
-│  Google Ads  ·  Apartments.com (ILS)  ·  Market Data           │
+│                     Source Systems                              │
+│  RealPage (PMS)  ·  Knock (CRM)  ·  Birdeye (Reputation)        │
+│  Google Ads  ·  Apartments.com (ILS)  ·  Market Data            │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                     ┌──────▼──────┐
@@ -33,7 +33,7 @@ This is not a toy demo — it mirrors the architecture, schema complexity, and d
                            │
               ┌────────────┼────────────┐
               │            │            │
-       ┌──────▼──────┐  ┌─▼──┐  ┌─────▼─────┐
+       ┌──────▼──────┐  ┌─▼──┐  ┌─────▼──────┐
        │    GOLD     │  │ ML │  │ ANALYTICS  │
        │  (Metrics)  │  │    │  │ (Sandbox)  │
        └─────────────┘  └────┘  └────────────┘
@@ -41,7 +41,7 @@ This is not a toy demo — it mirrors the architecture, schema complexity, and d
      ┌────────┴────────┐
      │  DIM (Shared)   │  Kimball-style dimensions
      │  Master data    │  Referenced by all layers
-     └────────────────┘
+     └─────────────────┘
 ```
 
 ### Medallion Architecture + Dimensional Model
